@@ -56,8 +56,7 @@ RUN cd /tmp && \
     rm -rf "/tmp/"* && \
     echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc && \
     echo "export PATH=$CATALINA_HOME/bin:$JAVA_HOME/bin:$PATH" >> ~/.bashrc && \
-    echo "export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar" >> ~/.bashrc && \
-    echo "export CATALINA_HOME=$CATALINA_HOME" >> ~/.bashrc
+    echo "export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar" >> ~/.bashrc
     
     
 EXPOSE 8080
