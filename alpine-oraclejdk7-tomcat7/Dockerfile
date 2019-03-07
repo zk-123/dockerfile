@@ -1,22 +1,25 @@
-# copy from https://github.com/frol/docker-alpine-java/blob/master/Dockerfile
 FROM frolvlad/alpine-glibc:alpine-3.9
 
-ENV JAVA_VERSION=8 \
-    JAVA_UPDATE=202 \
-    JAVA_BUILD=08 \
-    JAVA_PATH=1961070e4c9b4e26a04e7f5a083f551e \
-    JAVA_HOME="/usr/lib/jvm/default-jvm"
+ENV JAVA_TAR_GZ_NAME=jdk-7u80-linux-x64.tar.gz \
+    JAVA_DIR_NAME=jdk1.7.0_80 \
+    JAVA_HOME=/etc/jdk \
 
-RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates unzip && \
-    cd "/tmp" && \
-    wget --header "Cookie: oraclelicense=accept-securebackup-cookie;" \
-        "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}u${JAVA_UPDATE}-b${JAVA_BUILD}/${JAVA_PATH}/jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" && \
-    tar -xzf "jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-x64.tar.gz" && \
-    mkdir -p "/usr/lib/jvm" && \
-    mv "/tmp/jdk1.${JAVA_VERSION}.0_${JAVA_UPDATE}" "/usr/lib/jvm/java-${JAVA_VERSION}-oracle" && \
-    ln -s "java-${JAVA_VERSION}-oracle" "$JAVA_HOME" && \
-    ln -s "$JAVA_HOME/bin/"* "/usr/bin/" && \
-    rm -rf "$JAVA_HOME/"*src.zip && \
+    TOMCAT_TAR_GZ_NAME=apache-tomcat-7.0.85.tar.gz \
+    TOMCAT_DIR_NAME=apache-tomcat-7.0.85 \
+    CATALINA_HOME=/opt/tomcat
+
+WORKDIR ./
+
+RUN cd /tmp && \
+    wget http://192.168.224.29/${TOMCAT_TAR_GZ_NAME} && \
+    wget http://192.168.224.29/${JAVA_TAR_GZ_NAME} && \
+    tar -xvf ${TOMCAT_TAR_GZ_NAME} && \
+    tar -xvf ${JAVA_TAR_GZ_NAME} && \
+    apk add --no-cache bash && \
+    mkdir -p ${JAVA_HOME} && \
+    mkdir -p ${CATALINA_HOME} && \
+    mv "/tmp/${JAVA_DIR_NAME}/"* "${JAVA_HOME}" && \
+    mv "/tmp/${TOMCAT_DIR_NAME}/"* "${CATALINA_HOME}" && \
     rm -rf "$JAVA_HOME/lib/missioncontrol" \
            "$JAVA_HOME/lib/visualvm" \
            "$JAVA_HOME/lib/"*javafx* \
@@ -50,14 +53,13 @@ RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates unzip &
            "$JAVA_HOME/jre/lib/jfr.jar" \
            "$JAVA_HOME/jre/lib/jfr" \
            "$JAVA_HOME/jre/lib/oblique-fonts" && \
-    wget --header "Cookie: oraclelicense=accept-securebackup-cookie;" \
-        "http://download.oracle.com/otn-pub/java/jce/${JAVA_VERSION}/jce_policy-${JAVA_VERSION}.zip" && \
-    unzip -jo -d "${JAVA_HOME}/jre/lib/security" "jce_policy-${JAVA_VERSION}.zip" && \
-    rm "${JAVA_HOME}/jre/lib/security/README.txt" && \
-    apk del build-dependencies && \
-    rm "/tmp/"* && \
-    \
-    echo 'public class Main { public static void main(String[] args) { System.out.println("Java code is running fine!"); } }' > Main.java && \
-    javac Main.java && \
-    java Main && \
-    rm -r "/tmp/"*
+    rm -rf "/tmp/"* && \
+    echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc && \
+    echo "export PATH=$CATALINA_HOME/bin:$JAVA_HOME/bin:$PATH" >> ~/.bashrc && \
+    echo "export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar" >> ~/.bashrc && \
+    echo "export CATALINA_HOME=$CATALINA_HOME" >> ~/.bashrc
+    
+    
+EXPOSE 8080
+
+CMD ["/bin/sh", "-c", "$CATALINA_HOME/bin/catalina.sh run"]
