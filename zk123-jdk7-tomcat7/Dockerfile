@@ -11,11 +11,15 @@ ENV JAVA_TAR_GZ_NAME=jdk-7u80-linux-x64.tar.gz \
 WORKDIR ./
 
 RUN cd /tmp && \
+    echo "http://mirrors.aliyun.com/alpine/v3.8/main" > /etc/apk/repositories && \
+    echo "http://mirrors.aliyun.com/alpine/v3.8/community" >> /etc/apk/repositories && \
+    apk add --no-cache bash tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
     wget http://192.168.24.109/${TOMCAT_TAR_GZ_NAME} && \
     wget http://192.168.24.109/${JAVA_TAR_GZ_NAME} && \
     tar -xvf ${TOMCAT_TAR_GZ_NAME} && \
     tar -xvf ${JAVA_TAR_GZ_NAME} && \
-    apk add --no-cache bash && \
     mkdir -p ${JAVA_HOME} && \
     mkdir -p ${CATALINA_HOME} && \
     mv "/tmp/${JAVA_DIR_NAME}/"* "${JAVA_HOME}" && \
@@ -60,8 +64,7 @@ RUN cd /tmp && \
     echo "export CATALINA_HOME=$CATALINA_HOME" >> ~/.bashrc && \
     echo "export TOMCAT_HOME=$CATALINA_HOME" >> ~/.bashrc && \
     echo "PS1=\"[\u@\h \W]# \"" >>  ~/.bashrc && \
-    echo "cd $CATALINA_HOME" >>  ~/.bashrc && \    
-  
+    echo "cd $CATALINA_HOME" >>  ~/.bashrc && \
     mkdir /docker-tomcat-init.d && \
     touch /init.sh && \
     chmod +x /init.sh && \
