@@ -67,7 +67,7 @@ RUN cd /tmp && \
     touch /init.sh && \
     chmod +x /init.sh && \
     echo "#!/bin/bash" >> /init.sh && \
-    echo -e "if [[ \`ls -A /docker-tomcat-init.d|wc -w\` ]] ;then\n  $CATALINA_HOME/bin/catalina.sh run\n  exit 0 \nfi;" >> /init.sh && \
+    echo -e "if [[ \`ls -A /docker-tomcat-init.d|wc -w\` -eq 0 ]] ;then\n  $CATALINA_HOME/bin/catalina.sh run\n  exit 0 \nfi;" >> /init.sh && \
     echo "mkdir ${CATALINA_HOME}/webapps/"'${PROJECT_NAME}'"" >> /init.sh && \
     echo "unzip /docker-tomcat-init.d/war/"'${PROJECT_NAME}'".war -d ${CATALINA_HOME}/webapps/"'${PROJECT_NAME}'"" >> /init.sh && \
     echo "cp -r /docker-tomcat-init.d/conf/* -d ${CATALINA_HOME}/webapps/"'${PROJECT_NAME}'"/WEB-INF/classes" >> /init.sh && \
