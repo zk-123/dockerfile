@@ -11,6 +11,8 @@ ENV JAVA_TAR_GZ_NAME=jdk-7u80-linux-x64.tar.gz \
 WORKDIR ./
 
 RUN cd /tmp && \
+    echo "https://mirrors.ustc.edu.cn/alpine/v3.9/main" > /etc/apk/repositories && \
+    echo "https://mirrors.ustc.edu.cn/alpine/v3.9/community" >> /etc/apk/repositories  && \
     apk add --no-cache bash tzdata && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
